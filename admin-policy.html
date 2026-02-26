@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布新政策</title>
+    <style>
+        :root { --primary-red: #B22222; --bg-color: #F9F7F2; --card-bg: #fff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: var(--bg-color); padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 24px; border-radius: 8px; }
+        h2 { color: var(--primary-red); margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        textarea { min-height: 150px; }
+        button { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>发布新政策</h2>
+        <div class="form-group">
+            <label>政策标题</label>
+            <input type="text" id="policyTitle" placeholder="请输入政策标题">
+        </div>
+        <div class="form-group">
+            <label>政策内容</label>
+            <textarea id="policyContent" placeholder="请输入政策内容..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>发布单位</label>
+            <input type="text" id="policyPublisher" value="四仙村村民委员会">
+        </div>
+        <button id="submitBtn">发布政策</button>
+    </div>
+
+    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script>
+        const app = cloud.init({ env: 'myweb-9g0e5koaf2b403dd' })
+
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const title = document.getElementById('policyTitle').value
+            const content = document.getElementById('policyContent').value
+            const publisher = document.getElementById('policyPublisher').value
+
+            if (!title || !content) {
+                alert('请填写标题和内容')
+                return
+            }
+
+            try {
+                const res = await app.callFunction({
+                    name: 'submitPolicy',
+                    data: { title, content, publisher }
+                })
+                if (res.result.code === 0) {
+                    alert('发布成功！')
+                    window.location.href = 'policies.html'
+                } else {
+                    alert('发布失败：' + res.result.msg)
+                }
+            } catch (err) {
+                alert('网络错误')
+            }
+        })
+    </script>
+</body>
+</html>
