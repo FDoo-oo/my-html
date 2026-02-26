@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四仙便民通 - 互联网 + 乡村治理</title>
+    <style>
+        :root {
+            --primary-red: #B22222;
+            --primary-dark: #8B0000;
+            --bg-color: #F9F7F2;
+            --card-bg: #FFFFFF;
+            --text-main: #2C2C2C;
+            --text-secondary: #666666;
+            --border-color: #DCCFC2;
+            --shadow: 0 4px 12px rgba(178, 34, 34, 0.08);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .header-title {
+            display: inline-block;
+            border: 2px solid white;
+            padding: 8px 24px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            font-size: 18px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+        nav a.active {
+            border-bottom: 2px solid white;
+        }
+        main {
+            max-width: 800px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .form-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+        select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            background: white;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .photo-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 4px;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .photo-upload:hover {
+            border-color: var(--primary-red);
+            color: var(--primary-red);
+        }
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">四仙便民通</div>
+        <nav>
+            <a href=" " class="active">一键上报</a >
+            <a href="logs.html">民情日志</a >
+            <a href="#">政策速递</a >
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-card">
+            <div class="form-group">
+                <label for="categorySelect">问题类别</label>
+                <select id="categorySelect">
+                    <option value="公共设施">公共设施</option>
+                    <option value="环境卫生">环境卫生</option>
+                    <option value="安全隐患">安全隐患</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="descTextarea">问题描述</label>
+                <textarea id="descTextarea" placeholder="请详细描述现场情况..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>现场照片</label>
+                <div class="photo-upload" id="photoUpload">
+                    <div style="width: 80px; height: 80px; background: #FFE4B5; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #8B4513;">PlaceHolder</div>
+                    点击上传现场照片
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn">提交上报</button>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 四仙村村民委员会 版权所有<br>
+        探索“互联网 + 乡村治理”微创新模式
+    </footer>
+
+    <!-- 引入腾讯云开发SDK -->
+    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script>
+        // 初始化云开发（请替换为你的环境ID）
+        const app = window.cloud.init({
+            env: 'myweb-9g0e5koaf2b403dd' // 从腾讯云开发控制台获取
+        })
+
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const category = document.getElementById('categorySelect').value
+            const description = document.getElementById('descTextarea').value
+
+            if (!description.trim()) {
+                alert('请填写问题描述')
+                return
+            }
+
+            try {
+                const res = await app.callFunction({
+                    name: 'submitReport',
+                    data: {
+                        category: category,
+                        description: description,
+                        location: '四仙村主干道（村委会至小学段）', // 可根据需要修改
+                        time: new Date().toLocaleString()
+                    }
+                })
+
+                if (res.result.code === 0) {
+                    alert('上报成功！系统已自动记录时间与地点。网格员将尽快处理。')
+                    document.getElementById('descTextarea').value = ''
+                } else {
+                    alert('上报失败：' + res.result.msg)
+                }
+            } catch (err) {
+                console.error(err)
+                alert('网络错误，请重试')
+            }
+        })
+    </script>
+</body>
+</html>
