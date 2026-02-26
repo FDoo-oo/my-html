@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四仙便民通 - 民情日志</title>
+    <style>
+        :root {
+            --primary-red: #B22222;
+            --primary-dark: #8B0000;
+            --bg-color: #F9F7F2;
+            --card-bg: #FFFFFF;
+            --text-main: #2C2C2C;
+            --text-secondary: #666666;
+            --border-color: #DCCFC2;
+            --shadow: 0 4px 12px rgba(178, 34, 34, 0.08);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+        header {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .header-title {
+            display: inline-block;
+            border: 2px solid white;
+            padding: 8px 24px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            font-size: 18px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+        nav a.active {
+            border-bottom: 2px solid white;
+        }
+        main {
+            max-width: 800px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .log-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+        .log-card h3 {
+            color: var(--primary-red);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .log-card p {
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        .log-card small {
+            color: var(--text-secondary);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .status-pending {
+            background-color: #FFF3CD;
+            color: #856404;
+        }
+        .status-processing {
+            background-color: #D1ECF1;
+            color: #0C5460;
+        }
+        .status-done {
+            background-color: #D4EDDA;
+            color: #155724;
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">四仙便民通</div>
+        <nav>
+            <a href=" ">一键上报</a >
+            <a href="logs.html" class="active">民情日志</a >
+            <a href="#">政策速递</a >
+        </nav>
+    </header>
+
+    <main>
+        <div id="logsList">
+            <!-- 上报记录会在这里动态生成 -->
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 四仙村村民委员会 版权所有<br>
+        探索“互联网 + 乡村治理”微创新模式
+    </footer>
+
+    <!-- 引入腾讯云开发SDK -->
+    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script>
+        // 初始化云开发（请替换为你的环境ID）
+        const app = cloud.init({
+            env: 'myweb-9g0e5koaf2b403dd' // 从腾讯云开发控制台获取
+        })
+
+        window.onload = async () => {
+            try {
+                const res = await app.callFunction({
+                    name: 'getReports'
+                })
+
+                if (res.result.code === 0) {
+                    const list = document.getElementById('logsList')
+                    const reports = res.result.data
+
+                    if (reports.length === 0) {
+                        list.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">暂无上报记录</p >'
+                        return
+                    }
+
+                    reports.forEach(item => {
+                        let statusClass = 'status-pending'
+                        if (item.status === '处理中') statusClass = 'status-processing'
+                        if (item.status === '已处理') statusClass = 'status-done'
+
+                        const card = document.createElement('div')
+                        card.className = 'log-card'
+                        card.innerHTML = `
+                            <h3>${item.category} <span class="status-badge ${statusClass}">${item.status}</span></h3>
+                            <p>${item.description}</p >
+                            <small>${item.time} | ${item.location}</small>
+                        `
+                        list.appendChild(card)
+                    })
+                } else {
+                    alert('获取数据失败：' + res.result.msg)
+                }
+            } catch (err) {
+                console.error(err)
+                alert('网络错误，请重试')
+            }
+        }
+    </script>
+</body>
+</html>
