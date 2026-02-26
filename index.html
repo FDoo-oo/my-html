@@ -172,44 +172,41 @@
     <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
     <script>
         // 初始化云开发（请替换为你的环境ID）
-          const app = cloud.init({
-    env: 'myweb-9g0e5koaf2b403dd'
-  });
+        const app = cloud.init({
+            env: 'myweb-9g0e5koaf2b403dd' // 从腾讯云开发控制台获取
+        })
 
-  document.getElementById('submitBtn').addEventListener('click', async function() {
-    // 先从页面取值
-    const category = document.getElementById('categorySelect').value;
-    const description = document.getElementById('descText').value;
-    const location = document.getElementById('locationInput').value;
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const category = document.getElementById('categorySelect').value
+            const description = document.getElementById('descTextarea').value
 
-    // 简单校验
-    if (!description.trim()) {
-      alert('请填写问题描述');
-      return;
-    }
+            if (!description.trim()) {
+                alert('请填写问题描述')
+                return
+            }
 
-    try {
-      const res = await app.callFunction({
-        name: 'submitReport',
-        data: {
-          category: category,
-          description: description,
-          location: location,
-          time: new Date().toLocaleString()
-        }
-      });
-      if (res.result.code === 0) {
-        alert('上报成功！');
-        // 清空表单
-        document.getElementById('descText').value = '';
-        document.getElementById('locationInput').value = '';
-      } else {
-        alert('上报失败：' + res.result.msg);
-      }
-    } catch (err) {
-      alert('调用云函数失败：' + err.message);
-    }
-  });
+            try {
+                const res = await app.callFunction({
+                    name: 'submitReport',
+                    data: {
+                        category: category,
+                        description: description,
+                        location: '四仙村主干道（村委会至小学段）', // 可根据需要修改
+                        time: new Date().toLocaleString()
+                    }
+                })
+
+                if (res.result.code === 0) {
+                    alert('上报成功！系统已自动记录时间与地点。网格员将尽快处理。')
+                    document.getElementById('descTextarea').value = ''
+                } else {
+                    alert('上报失败：' + res.result.msg)
+                }
+            } catch (err) {
+                console.error(err)
+                alert('网络错误，请重试')
+            }
+        })
     </script>
 </body>
 </html>
