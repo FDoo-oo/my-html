@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四仙便民通 - 政策速递</title>
+    <style>
+        :root {
+            --primary-red: #B22222;
+            --bg-color: #F9F7F2;
+            --card-bg: #FFFFFF;
+            --text-main: #2C2C2C;
+            --text-secondary: #666666;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg-color); color: var(--text-main); }
+        header {
+            background: var(--primary-red);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
+        .header-title {
+            display: inline-block;
+            border: 2px solid white;
+            padding: 8px 24px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            font-size: 18px;
+        }
+        nav a { color: white; text-decoration: none; padding-bottom: 4px; border-bottom: 2px solid transparent; }
+        nav a.active { border-bottom: 2px solid white; }
+        main { max-width: 800px; margin: 24px auto; padding: 0 16px; }
+        .page-title {
+            text-align: center;
+            color: var(--primary-red);
+            font-size: 36px;
+            margin: 24px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary-red);
+            display: inline-block;
+        }
+        .title-wrap { text-align: center; }
+        .policy-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-red);
+        }
+        .policy-card h3 {
+            color: var(--text-main);
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .policy-card p {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .policy-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .detail-link {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">四仙便民通</div>
+        <nav>
+            <a href=" ">一键上报</a >
+            <a href="logs.html">民情日志</a >
+            <a href="policies.html" class="active">政策速递</a >
+        </nav>
+    </header>
+
+    <main>
+        <div class="title-wrap">
+            <h1 class="page-title">惠民政策速递</h1>
+        </div>
+        <div id="policiesList">
+            <!-- 政策列表会在这里动态生成 -->
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 四仙村村民委员会 版权所有<br>
+        探索“互联网 + 乡村治理”微创新模式
+    </footer>
+
+    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script>
+        const app = cloud.init({ env: 'myweb-9g0e5koaf2b403dd' })
+
+        window.onload = async () => {
+            try {
+                const res = await app.callFunction({ name: 'getPolicies' })
+                if (res.result.code === 0) {
+                    const list = document.getElementById('policiesList')
+                    const policies = res.result.data
+
+                    if (policies.length === 0) {
+                        list.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">暂无政策发布</p >'
+                        return
+                    }
+
+                    policies.forEach(item => {
+                        const card = document.createElement('div')
+                        card.className = 'policy-card'
+                        const time = new Date(item.publishTime).toLocaleDateString()
+                        card.innerHTML = `
+                            <h3>${item.title}</h3>
+                            <p>${item.content.substring(0, 50)}...</p >
+                            <div class="policy-meta">
+                                <span>发布单位：${item.publisher}</span>
+                                <span>${time}</span>
+                            </div>
+                            <a href="policy-detail.html?id=${item._id}" class="detail-link">点击查看详情 ></a >
+                        `
+                        list.appendChild(card)
+                    })
+                } else {
+                    alert('获取政策失败：' + res.result.msg)
+                }
+            } catch (err) {
+                console.error(err)
+                alert('网络错误')
+            }
+        }
+    </script>
+</body>
+</html>
