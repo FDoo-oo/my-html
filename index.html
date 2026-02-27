@@ -160,7 +160,6 @@
             <a href="#policies" class="nav-link">政策速递</a>
         </nav>
     </header>
-
     <div class="container">
         <!-- 一键上报 -->
         <div id="report" class="page">
@@ -190,13 +189,11 @@
                 </form>
             </div>
         </div>
-
         <!-- 民情日志 -->
         <div id="logs" class="page active">
             <h2>民情日志档案</h2>
             <div id="log-list-container"></div>
         </div>
-
         <!-- 政策速递 -->
         <div id="policies" class="page">
             <h2>政策速递</h2>
@@ -207,26 +204,26 @@
     <!-- 引入腾讯云SDK -->
     <script src="https://web-9g2kcz2s224a17b6-1304608125.tcloudbaseapp.com/sdk/1.8.0/tcb-web-sdk.js"></script>
     <script>
-        // 原有本地模拟数据（作为兜底）
+        // 本地模拟数据（作为兜底）
         const logsData = [
             {
                 title: "关于村西头路灯维修的走访记录",
                 date: "2026-01-28",
-                summary: "今日走访王大爷家，反映村西头主干道第3号路灯损坏，夜间出行不便。已现场拍照记录，并联系电力维修部门，预计明日修复。村民对响应速度表示满…",
+                summary: "今日走访王大爷家，反映村西头主干道第3号路灯损坏，夜间出行不便。已现场拍照记录，并联系电力维修部门，预计明日修复。村民对响应速度表示满...",
                 person: "网格员 李建国",
                 status: "已解决"
             },
             {
                 title: "春节前夕困难家庭慰问记录",
                 date: "2026-01-20",
-                summary: "携米面油慰问品走访刘某某家，询问冬季取暖情况及身体状况。协助检查了家中电路安全，叮嘱注意用火用电。记录其希望申请临时救助的诉求，已带回…",
+                summary: "携米面油慰问品走访刘某某家，询问冬季取暖情况及身体状况。协助检查了家中电路安全，叮嘱注意用火用电。记录其希望申请临时救助的诉求，已带回...",
                 person: "村支书 张爱民",
                 status: "跟进中"
             },
             {
                 title: "村民土地流转意愿调查",
                 date: "2025-12-15",
-                summary: "针对 upcoming 的农业合作社项目，走访第三组村民，收集土地流转意愿。大部分村民支持统一规划，少数村民对补偿标准有疑虑，已记录并在后续会议…",
+                summary: "针对 upcoming 的农业合作社项目，走访第三组村民，收集土地流转意愿。大部分村民支持统一规划，少数村民对补偿标准有疑虑，已记录并在后续会议...",
                 person: "村主任 王大春",
                 status: "跟进中"
             }
@@ -247,22 +244,25 @@
             }
         ];
 
-        // 云环境初始化
-        let app, db;
-        function initCloud() {
+        // 全局变量
+        let app = null;
+        let db = null;
+
+        // 初始化云环境
+        async function initCloud() {
             try {
-                const app = tcb.init({
-  env: 'myweb-9g0e5koaf2b403dd'
-});
-const auth = app.auth();
-// 匿名登录，解决“未登录”问题
-auth.anonymousAuthProvider().signIn().then(() => {
-  console.log("匿名登录成功");
-});
-                db = cloud.database();
-                console.log("云环境初始化成功");
+                app = tcb.init({ env: 'myweb-9g0e5koaf2b403dd' });
+                const auth = app.auth();
+                // 匿名登录
+                await auth.anonymousAuthProvider().signIn().catch(err => {
+                    console.warn('匿名登录失败，但可能不影响后续只读操作', err);
+                });
+                db = app.database();
+                console.log('云环境初始化成功');
             } catch (err) {
-                console.error("云环境初始化失败：", err);
+                console.error('云环境初始化失败：', err);
+                app = null;
+                db = null;
             }
         }
 
@@ -273,17 +273,17 @@ auth.anonymousAuthProvider().signIn().then(() => {
                 const res = await db.collection('peopleLogs').orderBy('publishTime', 'desc').get();
                 if (res.data && res.data.length > 0) {
                     return res.data.map(item => ({
-                        title: item.title,
-                        date: item.date,
-                        summary: item.content.substring(0, 100) + "...",
-                        person: item.person,
-                        status: item.status
+                        title: item.title || '无标题',
+                        date: item.date || '未知日期',
+                        summary: item.content ? (item.content.substring(0, 100) + '...') : '',
+                        person: item.person || '网格员',
+                        status: item.status || '跟进中'
                     }));
                 } else {
                     return logsData; // 云数据为空时返回本地兜底数据
                 }
             } catch (err) {
-                console.error("拉取民情日志失败：", err);
+                console.error('拉取民情日志失败：', err);
                 return logsData; // 失败时返回本地兜底数据
             }
         }
@@ -295,17 +295,17 @@ auth.anonymousAuthProvider().signIn().then(() => {
                 const res = await db.collection('policies').orderBy('publishTime', 'desc').get();
                 if (res.data && res.data.length > 0) {
                     return res.data.map(item => ({
-                        title: item.title,
-                        date: item.date,
-                        summary: item.content.substring(0, 100) + "...",
-                        publisher: item.publisher
+                        title: item.title || '无标题',
+                        date: item.date || '未知日期',
+                        summary: item.content ? (item.content.substring(0, 100) + '...') : '',
+                        publisher: item.publisher || '村委会'
                     }));
                 } else {
-                    return policiesData; // 云数据为空时返回本地兜底数据
+                    return policiesData;
                 }
             } catch (err) {
-                console.error("拉取政策失败：", err);
-                return policiesData; // 失败时返回本地兜底数据
+                console.error('拉取政策失败：', err);
+                return policiesData;
             }
         }
 
@@ -364,26 +364,34 @@ auth.anonymousAuthProvider().signIn().then(() => {
         // 一键上报表单提交（接入云函数）
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            if (!app) {
+                alert('云服务未初始化，请刷新页面重试');
+                return;
+            }
+
             const category = document.getElementById('reportCategory').value;
             const description = document.getElementById('reportDesc').value;
             const location = document.getElementById('reportLocation').value;
-            const time = new Date().toLocaleString();
 
             if (!category || !description || !location) {
                 alert('请填写完整的上报信息！');
                 return;
             }
 
+            const time = new Date().toLocaleString();
+
             try {
                 const res = await app.callFunction({
                     name: 'submitReport',
                     data: { category, description, location, time }
                 });
-                if (res.result.code === 0) {
+
+                if (res.result && res.result.code === 0) {
                     alert('上报成功！我们会尽快处理。');
                     document.getElementById('reportForm').reset();
                 } else {
-                    alert('上报失败：' + res.result.msg);
+                    alert('上报失败：' + (res.result?.msg || '未知错误'));
                 }
             } catch (err) {
                 console.error('上报失败：', err);
@@ -407,7 +415,7 @@ auth.anonymousAuthProvider().signIn().then(() => {
 
         // 页面初始化
         async function initPage() {
-            initCloud();
+            await initCloud();           // 确保云初始化完成
             const logs = await getLogsFromCloud();
             const policies = await getPoliciesFromCloud();
             renderLogs(logs);
