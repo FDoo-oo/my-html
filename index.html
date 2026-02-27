@@ -205,7 +205,7 @@
     </div>
 
     <!-- 引入腾讯云SDK -->
-    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script src="https://web-9g2kcz2s224a17b6-1304608125.tcloudbaseapp.com/sdk/1.8.0/tcb-web-sdk.js"></script>
     <script>
         // 原有本地模拟数据（作为兜底）
         const logsData = [
@@ -251,9 +251,14 @@
         let app, db;
         function initCloud() {
             try {
-                app = cloud.init({
-                    env: 'myweb-9g0e5koaf2b403dd' // 替换为你的云开发环境ID
-                });
+                const app = tcb.init({
+  env: 'myweb-9g0e5koaf2b403dd'
+});
+const auth = app.auth();
+// 匿名登录，解决“未登录”问题
+auth.anonymousAuthProvider().signIn().then(() => {
+  console.log("匿名登录成功");
+});
                 db = cloud.database();
                 console.log("云环境初始化成功");
             } catch (err) {
