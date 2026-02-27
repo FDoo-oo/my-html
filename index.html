@@ -3,510 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>四仙便民通</title>
+    <title>社区民情服务平台</title>
     <style>
-        /* 样式保持不变，与之前相同 */
-        :root {
-            --primary-red: #B22222;
-            --bg-color: #F9F7F2;
-            --card-bg: #fff;
-            --text-dark: #333;
-            --text-light: #666;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Microsoft Yahei", sans-serif;
-        }
-        body {
-            background: var(--bg-color);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-        header {
-            background: var(--primary-red);
-            color: white;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            border: 1px solid white;
-            padding: 4px 12px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-            font-size: 16px;
-        }
-        nav a.active {
-            border-bottom: 2px solid white;
-            padding-bottom: 4px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        .page {
-            display: none;
-        }
-        .page.active {
-            display: block;
-        }
-        h2 {
-            color: var(--primary-red);
-            text-align: center;
-            margin-bottom: 24px;
-            font-size: 24px;
-            position: relative;
-        }
-        h2::after {
-            content: '';
-            width: 40px;
-            height: 2px;
-            background: var(--primary-red);
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        .list-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-        }
-        .list-date {
-            color: var(--text-light);
-            font-weight: normal;
-            font-size: 14px;
-        }
-        .list-summary {
-            color: var(--text-light);
-            font-size: 15px;
-            margin-bottom: 12px;
-        }
-        .list-meta {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: var(--text-light);
-        }
-        .tag {
-            background: #f0f0f0;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .tag.ongoing {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-        .tag.resolved {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        textarea {
-            min-height: 120px;
-        }
-        button {
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-        #init-status {
-            color: #666;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; text-align: center; }
+        .status-bar { text-align: center; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
+        .card { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 6px; background: #fafafa; }
+        .card h3 { margin-top: 0; color: #1976d2; }
+        .card .meta { font-size: 0.85em; color: #666; margin-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        .nav { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .nav-link { padding: 10px 20px; cursor: pointer; color: #666; text-decoration: none; }
+        .nav-link.active { color: #1976d2; border-bottom: 2px solid #1976d2; margin-bottom: -2px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .empty-tip { text-align: center; color: #999; padding: 20px; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">四仙便民通</div>
-        <nav>
-            <a href="#report" class="nav-link">一键上报</a>
-            <a href="#logs" class="nav-link active">民情日志</a>
-            <a href="#policies" class="nav-link">政策速递</a>
-        </nav>
-    </header>
-    <div class="container">
-        <!-- 一键上报 -->
-        <div id="report" class="page">
-            <h2>一键上报</h2>
-            <div id="init-status"></div>
-            <div class="card">
-                <form id="reportForm">
-                    <div class="form-group">
-                        <label for="reportCategory">问题类别</label>
-                        <select id="reportCategory" required aria-label="问题类别">
-                            <option value="" disabled selected>请选择问题类别</option>
-                            <option value="道路问题">道路问题</option>
-                            <option value="公共设施问题">公共设施问题</option>
-                            <option value="环境卫生问题">环境卫生问题</option>
-                            <option value="安全隐患">安全隐患</option>
-                            <option value="其他">其他</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportDesc">问题描述</label>
-                        <textarea id="reportDesc" placeholder="请详细描述问题情况..." required aria-label="问题描述"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="reportLocation">问题位置</label>
-                        <input type="text" id="reportLocation" placeholder="例如：四仙村一组" required aria-label="问题位置">
-                    </div>
-                    <button type="submit" id="submitBtn">提交上报</button>
-                </form>
-            </div>
-        </div>
-        <!-- 民情日志 -->
-        <div id="logs" class="page active">
-            <h2>民情日志档案</h2>
-            <div id="log-list-container"></div>
-        </div>
-        <!-- 政策速递 -->
-        <div id="policies" class="page">
-            <h2>政策速递</h2>
-            <div id="policy-list-container"></div>
+
+<div class="container">
+    <h1>社区民情服务平台</h1>
+    
+    <!-- 状态显示 -->
+    <div id="init-status" class="status-bar">正在初始化...</div>
+
+    <!-- 导航 -->
+    <div class="nav">
+        <div class="nav-link active" onclick="switchTab('home')">首页概况</div>
+        <div class="nav-link" onclick="switchTab('report')">民情上报</div>
+        <div class="nav-link" onclick="switchTab('logs')">民情日志</div>
+        <div class="nav-link" onclick="switchTab('policies')">政策公告</div>
+    </div>
+
+    <!-- 首页 -->
+    <div id="section-home" class="section active">
+        <div class="card">
+            <h3>欢迎使用</h3>
+            <p>本平台基于腾讯云 CloudBase 构建，提供民情上报、日志查询及政策公告功能。</p>
+            <p id="connection-status">正在连接云服务...</p>
         </div>
     </div>
 
-    <!-- 不再直接写死 script 标签，改用动态加载以支持备用 CDN -->
-    <script>
-        // 本地模拟数据（作为兜底）
-        const logsData = [
-            {
-                title: "关于村西头路灯维修的走访记录",
-                date: "2026-01-28",
-                summary: "今日走访王大爷家，反映村西头主干道第3号路灯损坏，夜间出行不便。已现场拍照记录，并联系电力维修部门，预计明日修复。村民对响应速度表示满...",
-                person: "网格员 李建国",
-                status: "已解决"
-            },
-            {
-                title: "春节前夕困难家庭慰问记录",
-                date: "2026-01-20",
-                summary: "携米面油慰问品走访刘某某家，询问冬季取暖情况及身体状况。协助检查了家中电路安全，叮嘱注意用火用电。记录其希望申请临时救助的诉求，已带回...",
-                person: "村支书 张爱民",
-                status: "跟进中"
-            },
-            {
-                title: "村民土地流转意愿调查",
-                date: "2025-12-15",
-                summary: "针对 upcoming 的农业合作社项目，走访第三组村民，收集土地流转意愿。大部分村民支持统一规划，少数村民对补偿标准有疑虑，已记录并在后续会议...",
-                person: "村主任 王大春",
-                status: "跟进中"
+    <!-- 上报表单 -->
+    <div id="section-report" class="section">
+        <div class="card">
+            <h3>提交民情上报</h3>
+            <div class="form-group">
+                <label>类别</label>
+                <select id="reportCategory">
+                    <option value="environment">环境卫生</option>
+                    <option value="security">治安安全</option>
+                    <option value="facility">公共设施</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>地点</label>
+                <input type="text" id="reportLocation" placeholder="请输入具体地点">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="reportDesc" rows="4" placeholder="请详细描述问题"></textarea>
+            </div>
+            <button id="submitBtn" onclick="submitReport()">提交上报</button>
+        </div>
+    </div>
+
+    <!-- 日志列表 -->
+    <div id="section-logs" class="section">
+        <h2>民情日志</h2>
+        <div id="log-list-container"></div>
+    </div>
+
+    <!-- 政策列表 -->
+    <div id="section-policies" class="section">
+        <h2>政策公告</h2>
+        <div id="policy-list-container"></div>
+    </div>
+</div>
+
+<script>
+    // 全局变量
+    let app = null;
+    let db = null;
+    let isInitCompleted = false;
+    
+    // 本地 fallback 数据
+    const logsData = [];
+    const policiesData = [];
+
+    // 1. 定义备选 CDN 列表
+    const cdnList = [
+        'https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js',
+        'https://web.sdk.qcloud.com/tcb/1.8.0/tcb-web-sdk.js'
+    ];
+
+    // 2. 加载 SDK 函数
+    function loadSDK(urls, index = 0) {
+        return new Promise((resolve, reject) => {
+            if (index >= urls.length) {
+                reject(new Error('所有 SDK CDN 均加载失败'));
+                return;
             }
-        ];
+            const script = document.createElement('script');
+            script.src = urls[index];
+            script.onload = () => {
+                console.log(`SDK 加载成功：${urls[index]}`);
+                resolve();
+            };
+            script.onerror = () => {
+                console.warn(`SDK 加载失败：${urls[index]}, 尝试下一个...`);
+                loadSDK(urls, index + 1).then(resolve).catch(reject);
+            };
+            document.head.appendChild(script);
+        });
+    }
 
-        const policiesData = [
-            {
-                title: "关于2026年春季农业生产补贴政策",
-                date: "2026-02-01",
-                summary: "为支持春季农业生产，对本村种植户给予每亩50元的种子补贴，申请截止日期为2026年3月1日。",
-                publisher: "村委会"
-            },
-            {
-                title: "四仙村人居环境整治行动方案",
-                date: "2026-01-10",
-                summary: "自2026年2月起，开展全村人居环境整治，重点清理垃圾堆放点、河道漂浮物，每户需落实门前三包责任。",
-                publisher: "村委会"
-            }
-        ];
+    // 3. 初始化云环境
+    async function initCloud() {
+        const statusDiv = document.getElementById('init-status');
+        const submitBtn = document.getElementById('submitBtn');
+        const connStatus = document.getElementById('connection-status');
 
-        // 全局变量
-        let app = null;
-        let db = null;
-        let isInitCompleted = false;
+        if (statusDiv) statusDiv.innerText = '正在连接云服务...';
+        if (statusDiv) statusDiv.style.color = '#666';
+        if (submitBtn) submitBtn.disabled = true;
 
-        // 动态加载 SDK（支持多个备用地址）
-        function loadSDK(urls, index = 0) {
-            return new Promise((resolve, reject) => {
-                if (index >= urls.length) {
-                    reject(new Error('所有 SDK CDN 均加载失败'));
-                    return;
-                }
-                const script = document.createElement('script');
-                script.src = urls[index];
-                script.onload = () => {
-                    console.log(`SDK 加载成功: ${urls[index]}`);
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.warn(`SDK 加载失败: ${urls[index]}, 尝试下一个...`);
-                    loadSDK(urls, index + 1).then(resolve).catch(reject);
-                };
-                document.head.appendChild(script);
-            });
-        }
-
-        // 初始化云环境（必须先确保 SDK 已加载）
-        async function initCloud() {
-            const statusDiv = document.getElementById('init-status');
-            const submitBtn = document.getElementById('submitBtn');
+        try {
+            // 确保 SDK 已加载
+            await loadSDK(cdnList);
             
+            // 初始化 TCB (请确认你的环境 ID 是否正确，去掉空格)
+            // 注意：这里使用的是你提供的 ID，请确保在腾讯云控制台核对无误
+            const envId = 'myweb-9g0e5koaf2b403dd'; 
+            app = tcb.init({ env: envId });
+            
+            const auth = app.auth();
+            await auth.anonymousAuthProvider().signIn();
+            
+            db = app.database();
+            isInitCompleted = true;
+
+            console.log('云环境初始化成功');
             if (statusDiv) {
-                statusDiv.innerText = '正在连接云服务...';
-                statusDiv.style.color = '#666';
+                statusDiv.innerText = '✓ 云服务连接成功';
+                statusDiv.style.color = '#388e3c';
+                if(connStatus) connStatus.innerText = '已连接至云端数据库';
+                setTimeout(() => { if(statusDiv) statusDiv.innerText = ''; }, 3000);
             }
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.6';
-            }
+        } catch (err) {
+            console.error('云环境初始化失败：', err);
+            app = null;
+            db = null;
+            isInitCompleted = false;
             
-            try {
-                // 定义备选 CDN 列表
-                const cdnList = [
-                    'https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js',
-                    'https://web.sdk.qcloud.com/tcb/1.8.0/tcb-web-sdk.js'
-                ];
-                
-                // 加载 SDK
-                await loadSDK(cdnList);
-                
-                // 现在 tcb 应该可用
-                app = tcb.init({ env: 'myweb-9g0e5koaf2b403dd' });
-                const auth = app.auth();
-                await auth.anonymousAuthProvider().signIn();
-                db = app.database();
-                isInitCompleted = true;
-                console.log('云环境初始化成功');
-                
-                if (statusDiv) {
-                    statusDiv.innerText = '✓ 云服务连接成功';
-                    statusDiv.style.color = '#388e3c';
-                    setTimeout(() => {
-                        statusDiv.innerText = '';
-                    }, 3000);
-                }
-            } catch (err) {
-                console.error('云环境初始化失败：', err);
-                app = null;
-                db = null;
-                isInitCompleted = false;
-                
-                let errorMsg = '✗ 云服务初始化失败，使用本地数据模式。';
-                if (err.message.includes('所有 SDK CDN 均加载失败')) {
-                    errorMsg = '✗ 无法加载腾讯云 SDK，请检查网络或防火墙设置。';
-                }
-                if (statusDiv) {
-                    statusDiv.innerText = errorMsg;
-                    statusDiv.style.color = '#f57c00';
-                }
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                }
+            let errorMsg = '✗ 云服务初始化失败，使用本地数据模式。';
+            if (err.message && err.message.includes('所有 SDK CDN 均加载失败')) {
+                errorMsg = '✗ 无法加载腾讯云 SDK，请检查网络或防火墙设置。';
+            }
+            if (statusDiv) {
+                statusDiv.innerText = errorMsg;
+                statusDiv.style.color = '#f57c00';
+            }
+            if(connStatus) connStatus.innerText = errorMsg;
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = 1;
             }
         }
+    }
 
-        // 从云数据库拉取民情日志
-        async function getLogsFromCloud() {
-            if (!db || !isInitCompleted) return logsData;
-            try {
-                const res = await db.collection('peopleLogs').orderBy('publishTime', 'desc').get();
-                if (res.data && res.data.length > 0) {
-                    return res.data.map(item => ({
-                        title: item.title || '无标题',
-                        date: item.date || '未知日期',
-                        summary: item.content ? (item.content.substring(0, 100) + '...') : '',
-                        person: item.person || '网格员',
-                        status: item.status || '跟进中'
-                    }));
-                } else {
-                    return logsData;
-                }
-            } catch (err) {
-                console.error('拉取民情日志失败：', err);
+    // 4. 从云数据库拉取民情日志
+    async function getLogsFromCloud() {
+        if (!db || !isInitCompleted) return logsData;
+        try {
+            const res = await db.collection('peopleLogs').orderBy('publishTime', 'desc').get();
+            if (res.data && res.data.length > 0) {
+                return res.data.map(item => ({
+                    title: item.title || '无标题',
+                    date: item.date || '未知日期',
+                    summary: item.content ? (item.content.substring(0, 100) + '...') : '',
+                    publisher: item.publisher || '村民'
+                }));
+            } else {
                 return logsData;
             }
+        } catch (err) {
+            console.error('拉取日志失败：', err);
+            return logsData;
         }
+    }
 
-        // 从云数据库拉取政策
-        async function getPoliciesFromCloud() {
-            if (!db || !isInitCompleted) return policiesData;
-            try {
-                const res = await db.collection('policies').orderBy('publishTime', 'desc').get();
-                if (res.data && res.data.length > 0) {
-                    return res.data.map(item => ({
-                        title: item.title || '无标题',
-                        date: item.date || '未知日期',
-                        summary: item.content ? (item.content.substring(0, 100) + '...') : '',
-                        publisher: item.publisher || '村委会'
-                    }));
-                } else {
-                    return policiesData;
-                }
-            } catch (err) {
-                console.error('拉取政策失败：', err);
+    // 5. 从云数据库拉取政策
+    async function getPoliciesFromCloud() {
+        if (!db || !isInitCompleted) return policiesData;
+        try {
+            const res = await db.collection('policies').orderBy('publishTime', 'desc').get();
+            if (res.data && res.data.length > 0) {
+                return res.data.map(item => ({
+                    title: item.title || '无标题',
+                    date: item.date || '未知日期',
+                    summary: item.content ? (item.content.substring(0, 100) + '...') : '',
+                    publisher: item.publisher || '村委会'
+                }));
+            } else {
                 return policiesData;
             }
+        } catch (err) {
+            console.error('拉取政策失败：', err);
+            return policiesData;
+        }
+    }
+
+    // 6. 渲染民情日志列表
+    function renderLogs(logs) {
+        const container = document.getElementById('log-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!logs || logs.length === 0) {
+            container.innerHTML = '<div class="empty-tip">暂无日志数据</div>';
+            return;
+        }
+        logs.forEach(log => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${log.title}</h3>
+                <div class="meta">发布：${log.publisher} | 时间：${log.date}</div>
+                <div>${log.summary}</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 7. 渲染政策列表
+    function renderPolicies(policies) {
+        const container = document.getElementById('policy-list-container');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!policies || policies.length === 0) {
+            container.innerHTML = '<div class="empty-tip">暂无政策公告</div>';
+            return;
+        }
+        policies.forEach(policy => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <h3>${policy.title}</h3>
+                <div class="meta">发布：${policy.publisher} | 时间：${policy.date}</div>
+                <div>${policy.summary}</div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 8. 提交上报函数
+    async function submitReport() {
+        if (!isInitCompleted) {
+            alert('云服务未就绪，当前使用本地数据模式，上报功能不可用。请刷新页面重试或检查网络。');
+            return;
+        }
+        if (!app) {
+            alert('云服务未初始化，请刷新页面重试');
+            return;
         }
 
-        // 渲染民情日志列表
-        function renderLogs(logs) {
-            const container = document.getElementById('log-list-container');
-            container.innerHTML = '';
-            if (logs.length === 0) {
-                container.innerHTML = '<div class="card" style="text-align:center; color:#666;">暂无民情日志</div>';
-                return;
-            }
-            logs.forEach(log => {
-                const card = document.createElement('div');
-                card.className = 'card list-item';
-                const statusClass = log.status === '已解决' ? 'resolved' : 'ongoing';
-                card.innerHTML = `
-                    <div class="list-header">
-                        <span>${log.title}</span>
-                        <span class="list-date">${log.date}</span>
-                    </div>
-                    <div class="list-summary">${log.summary}</div>
-                    <div class="list-meta">
-                        <span>走访人：${log.person}</span>
-                        <span class="tag ${statusClass}">${log.status}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        const category = document.getElementById('reportCategory').value;
+        const description = document.getElementById('reportDesc').value;
+        const location = document.getElementById('reportLocation').value;
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (!category || !description || !location) {
+            alert('请填写完整的上报信息！');
+            return;
         }
 
-        // 渲染政策列表
-        function renderPolicies(policies) {
-            const container = document.getElementById('policy-list-container');
-            container.innerHTML = '';
-            if (policies.length === 0) {
-                container.innerHTML = '<div class="card" style="text-align:center; color:#666;">暂无政策信息</div>';
-                return;
-            }
-            policies.forEach(policy => {
-                const card = document.createElement('div');
-                card.className = 'card list-item';
-                card.innerHTML = `
-                    <div class="list-header">
-                        <span>${policy.title}</span>
-                        <span class="list-date">${policy.date}</span>
-                    </div>
-                    <div class="list-summary">${policy.summary}</div>
-                    <div class="list-meta">
-                        <span>发布单位：${policy.publisher}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // 一键上报表单提交
-        document.getElementById('reportForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isInitCompleted) {
-                alert('云服务未就绪，当前使用本地数据模式，上报功能不可用。请刷新页面重试或检查网络。');
-                return;
-            }
-
-            if (!app) {
-                alert('云服务未初始化，请刷新页面重试');
-                return;
-            }
-
-            const category = document.getElementById('reportCategory').value;
-            const description = document.getElementById('reportDesc').value;
-            const location = document.getElementById('reportLocation').value;
-
-            if (!category || !description || !location) {
-                alert('请填写完整的上报信息！');
-                return;
-            }
-
-            const time = new Date().toLocaleString();
-            const submitBtn = document.getElementById('submitBtn');
+        const time = new Date().toLocaleString();
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerText = '提交中...';
             
-            try {
-                submitBtn.disabled = true;
-                submitBtn.innerText = '提交中...';
-                
-                const res = await app.callFunction({
-                    name: 'submitReport',
-                    data: { category, description, location, time }
-                });
-
-                if (res.result && res.result.code === 0) {
-                    alert('上报成功！我们会尽快处理。');
-                    document.getElementById('reportForm').reset();
-                } else {
-                    alert('上报失败：' + (res.result?.msg || '未知错误'));
+            // 调用云函数 submitReport
+            const res = await app.callFunction({
+                name: 'submitReport',
+                data: {
+                    category: category,
+                    content: description,
+                    location: location,
+                    publishTime: new Date().getTime(),
+                    date: time
                 }
-            } catch (err) {
-                console.error('上报失败：', err);
-                alert('网络错误，请稍后重试。');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = '提交上报';
-            }
-        });
-
-        // 页面切换逻辑
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                document.querySelectorAll('.page').forEach(page => {
-                    page.classList.remove('active');
-                });
-                document.getElementById(targetId).classList.add('active');
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
             });
-        });
-
-        // 页面初始化
-        async function initPage() {
-            await initCloud();
-            const logs = await getLogsFromCloud();
-            const policies = await getPoliciesFromCloud();
-            renderLogs(logs);
-            renderPolicies(policies);
+            
+            console.log('云函数调用结果：', res);
+            alert('上报成功！');
+            // 清空表单
+            document.getElementById('reportDesc').value = '';
+            document.getElementById('reportLocation').value = '';
+        } catch (err) {
+            console.error('提交失败：', err);
+            alert('提交失败，请稍后重试。');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = '提交上报';
         }
+    }
 
-        // 执行初始化
-        document.addEventListener('DOMContentLoaded', initPage);
-    </script>
+    // 9. 页面 Tab 切换
+    function switchTab(tabName) {
+        // 隐藏所有 section
+        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        // 显示目标 section
+        const target = document.getElementById('section-' + tabName);
+        if (target) target.classList.add('active');
+
+        // 更新导航状态
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        // 简单处理：根据点击事件触发，这里为了简化逻辑，实际项目中建议绑定 event
+        event.target.classList.add('active');
+    }
+
+    // 10. 页面初始化入口
+    async function initPage() {
+        await initCloud();
+        // 并行加载数据
+        const [logs, policies] = await Promise.all([
+            getLogsFromCloud(),
+            getPoliciesFromCloud()
+        ]);
+        renderLogs(logs);
+        renderPolicies(policies);
+    }
+
+    // 监听 DOM 加载完成
+    document.addEventListener('DOMContentLoaded', initPage);
+</script>
 </body>
 </html>
