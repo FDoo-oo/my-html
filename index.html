@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>四仙便民通</title>
     <style>
+        /* 样式保持不变，与之前相同 */
         :root {
             --primary-red: #B22222;
             --bg-color: #F9F7F2;
@@ -207,8 +208,7 @@
         </div>
     </div>
 
-    <!-- 引入腾讯云SDK（使用官方有效地址） -->
-    <script src="https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js"></script>
+    <!-- 不再直接写死 script 标签，改用动态加载以支持备用 CDN -->
     <script>
         // 本地模拟数据（作为兜底）
         const logsData = [
@@ -253,9 +253,30 @@
         // 全局变量
         let app = null;
         let db = null;
-        let isInitCompleted = false; // 标记初始化是否完成
+        let isInitCompleted = false;
 
-        // 初始化云环境
+        // 动态加载 SDK（支持多个备用地址）
+        function loadSDK(urls, index = 0) {
+            return new Promise((resolve, reject) => {
+                if (index >= urls.length) {
+                    reject(new Error('所有 SDK CDN 均加载失败'));
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = urls[index];
+                script.onload = () => {
+                    console.log(`SDK 加载成功: ${urls[index]}`);
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.warn(`SDK 加载失败: ${urls[index]}, 尝试下一个...`);
+                    loadSDK(urls, index + 1).then(resolve).catch(reject);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // 初始化云环境（必须先确保 SDK 已加载）
         async function initCloud() {
             const statusDiv = document.getElementById('init-status');
             const submitBtn = document.getElementById('submitBtn');
@@ -270,14 +291,18 @@
             }
             
             try {
-                // 检查 tcb 是否已加载
-                if (typeof tcb === 'undefined') {
-                    throw new Error('腾讯云 SDK 加载失败，请检查网络连接');
-                }
+                // 定义备选 CDN 列表
+                const cdnList = [
+                    'https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js',
+                    'https://web.sdk.qcloud.com/tcb/1.8.0/tcb-web-sdk.js'
+                ];
                 
+                // 加载 SDK
+                await loadSDK(cdnList);
+                
+                // 现在 tcb 应该可用
                 app = tcb.init({ env: 'myweb-9g0e5koaf2b403dd' });
                 const auth = app.auth();
-                // 匿名登录
                 await auth.anonymousAuthProvider().signIn();
                 db = app.database();
                 isInitCompleted = true;
@@ -296,8 +321,12 @@
                 db = null;
                 isInitCompleted = false;
                 
+                let errorMsg = '✗ 云服务初始化失败，使用本地数据模式。';
+                if (err.message.includes('所有 SDK CDN 均加载失败')) {
+                    errorMsg = '✗ 无法加载腾讯云 SDK，请检查网络或防火墙设置。';
+                }
                 if (statusDiv) {
-                    statusDiv.innerText = '✗ 云服务初始化失败，使用本地数据模式。部分功能可能受限。';
+                    statusDiv.innerText = errorMsg;
                     statusDiv.style.color = '#f57c00';
                 }
             } finally {
@@ -322,11 +351,11 @@
                         status: item.status || '跟进中'
                     }));
                 } else {
-                    return logsData; // 云数据为空时返回本地兜底数据
+                    return logsData;
                 }
             } catch (err) {
                 console.error('拉取民情日志失败：', err);
-                return logsData; // 失败时返回本地兜底数据
+                return logsData;
             }
         }
 
@@ -403,17 +432,17 @@
             });
         }
 
-        // 一键上报表单提交（接入云函数）
+        // 一键上报表单提交
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!isInitCompleted) {
-                alert('云服务正在初始化或初始化失败，请稍后重试。当前使用本地数据模式。');
+                alert('云服务未就绪，当前使用本地数据模式，上报功能不可用。请刷新页面重试或检查网络。');
                 return;
             }
 
             if (!app) {
-                alert('云服务未就绪，请刷新页面重试');
+                alert('云服务未初始化，请刷新页面重试');
                 return;
             }
 
@@ -469,7 +498,7 @@
 
         // 页面初始化
         async function initPage() {
-            await initCloud();           // 确保云初始化完成
+            await initCloud();
             const logs = await getLogsFromCloud();
             const policies = await getPoliciesFromCloud();
             renderLogs(logs);
