@@ -149,6 +149,11 @@
         button:hover {
             opacity: 0.9;
         }
+        #init-status {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -164,11 +169,12 @@
         <!-- 一键上报 -->
         <div id="report" class="page">
             <h2>一键上报</h2>
+            <div id="init-status"></div>
             <div class="card">
                 <form id="reportForm">
                     <div class="form-group">
-                        <label>问题类别</label>
-                        <select id="reportCategory" required>
+                        <label for="reportCategory">问题类别</label>
+                        <select id="reportCategory" required aria-label="问题类别">
                             <option value="" disabled selected>请选择问题类别</option>
                             <option value="道路问题">道路问题</option>
                             <option value="公共设施问题">公共设施问题</option>
@@ -178,14 +184,14 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>问题描述</label>
-                        <textarea id="reportDesc" placeholder="请详细描述问题情况..." required></textarea>
+                        <label for="reportDesc">问题描述</label>
+                        <textarea id="reportDesc" placeholder="请详细描述问题情况..." required aria-label="问题描述"></textarea>
                     </div>
                     <div class="form-group">
-                        <label>问题位置</label>
-                        <input type="text" id="reportLocation" placeholder="例如：四仙村一组" required>
+                        <label for="reportLocation">问题位置</label>
+                        <input type="text" id="reportLocation" placeholder="例如：四仙村一组" required aria-label="问题位置">
                     </div>
-                    <button type="submit">提交上报</button>
+                    <button type="submit" id="submitBtn">提交上报</button>
                 </form>
             </div>
         </div>
@@ -201,8 +207,8 @@
         </div>
     </div>
 
-    <!-- 引入腾讯云SDK -->
-    <script src="https://web-9g2kcz2s224a17b6-1304608125.tcloudbaseapp.com/sdk/1.8.0/tcb-web-sdk.js"></script>
+    <!-- 引入腾讯云SDK（使用官方有效地址） -->
+    <script src="https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js"></script>
     <script>
         // 本地模拟数据（作为兜底）
         const logsData = [
@@ -247,28 +253,64 @@
         // 全局变量
         let app = null;
         let db = null;
+        let isInitCompleted = false; // 标记初始化是否完成
 
         // 初始化云环境
         async function initCloud() {
+            const statusDiv = document.getElementById('init-status');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (statusDiv) {
+                statusDiv.innerText = '正在连接云服务...';
+                statusDiv.style.color = '#666';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+            }
+            
             try {
+                // 检查 tcb 是否已加载
+                if (typeof tcb === 'undefined') {
+                    throw new Error('腾讯云 SDK 加载失败，请检查网络连接');
+                }
+                
                 app = tcb.init({ env: 'myweb-9g0e5koaf2b403dd' });
                 const auth = app.auth();
                 // 匿名登录
-                await auth.anonymousAuthProvider().signIn().catch(err => {
-                    console.warn('匿名登录失败，但可能不影响后续只读操作', err);
-                });
+                await auth.anonymousAuthProvider().signIn();
                 db = app.database();
+                isInitCompleted = true;
                 console.log('云环境初始化成功');
+                
+                if (statusDiv) {
+                    statusDiv.innerText = '✓ 云服务连接成功';
+                    statusDiv.style.color = '#388e3c';
+                    setTimeout(() => {
+                        statusDiv.innerText = '';
+                    }, 3000);
+                }
             } catch (err) {
                 console.error('云环境初始化失败：', err);
                 app = null;
                 db = null;
+                isInitCompleted = false;
+                
+                if (statusDiv) {
+                    statusDiv.innerText = '✗ 云服务初始化失败，使用本地数据模式。部分功能可能受限。';
+                    statusDiv.style.color = '#f57c00';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
             }
         }
 
         // 从云数据库拉取民情日志
         async function getLogsFromCloud() {
-            if (!db) return logsData;
+            if (!db || !isInitCompleted) return logsData;
             try {
                 const res = await db.collection('peopleLogs').orderBy('publishTime', 'desc').get();
                 if (res.data && res.data.length > 0) {
@@ -290,7 +332,7 @@
 
         // 从云数据库拉取政策
         async function getPoliciesFromCloud() {
-            if (!db) return policiesData;
+            if (!db || !isInitCompleted) return policiesData;
             try {
                 const res = await db.collection('policies').orderBy('publishTime', 'desc').get();
                 if (res.data && res.data.length > 0) {
@@ -365,8 +407,13 @@
         document.getElementById('reportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            if (!isInitCompleted) {
+                alert('云服务正在初始化或初始化失败，请稍后重试。当前使用本地数据模式。');
+                return;
+            }
+
             if (!app) {
-                alert('云服务未初始化，请刷新页面重试');
+                alert('云服务未就绪，请刷新页面重试');
                 return;
             }
 
@@ -380,8 +427,12 @@
             }
 
             const time = new Date().toLocaleString();
-
+            const submitBtn = document.getElementById('submitBtn');
+            
             try {
+                submitBtn.disabled = true;
+                submitBtn.innerText = '提交中...';
+                
                 const res = await app.callFunction({
                     name: 'submitReport',
                     data: { category, description, location, time }
@@ -396,6 +447,9 @@
             } catch (err) {
                 console.error('上报失败：', err);
                 alert('网络错误，请稍后重试。');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = '提交上报';
             }
         });
 
