@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发布民情日志</title>
+    <style>
+        :root { --primary-red: #B22222; --bg-color: #F9F7F2; --card-bg: #fff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: var(--bg-color); padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 24px; border-radius: 8px; }
+        h2 { color: var(--primary-red); margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        textarea { min-height: 150px; }
+        button { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>发布民情日志</h2>
+        <!-- 日志标题 -->
+        <div class="form-group">
+            <label>日志标题</label>
+            <input type="text" id="logTitle" placeholder="请输入民情日志标题">
+        </div>
+        <!-- 记录日期 -->
+        <div class="form-group">
+            <label>记录日期</label>
+            <input type="date" id="logDate">
+        </div>
+        <!-- 走访/记录人 -->
+        <div class="form-group">
+            <label>走访/记录人</label>
+            <input type="text" id="logPerson" placeholder="请填写走访人或记录人姓名/职务">
+        </div>
+        <!-- 处理状态 -->
+        <div class="form-group">
+            <label>问题处理状态</label>
+            <select id="logStatus">
+                <option value="" disabled selected>请选择处理状态</option>
+                <option value="待处理">待处理</option>
+                <option value="跟进中">跟进中</option>
+                <option value="已解决">已解决</option>
+                <option value="已反馈">已反馈</option>
+            </select>
+        </div>
+        <!-- 日志内容 -->
+        <div class="form-group">
+            <label>日志内容</label>
+            <textarea id="logContent" placeholder="请详细填写民情走访情况、村民诉求、处理措施、后续计划等..."></textarea>
+        </div>
+        <!-- 发布单位 -->
+        <div class="form-group">
+            <label>发布单位</label>
+            <input type="text" id="logPublisher" value="四仙村村民委员会">
+        </div>
+        <!-- 发布按钮 -->
+        <button id="submitLogBtn">发布民情日志</button>
+    </div>
+
+    <script src="https://imgcache.qq.com/sec/qcloud/qcloud-js-sdk/1.8.0/qcloud.min.js"></script>
+    <script>
+        // 云环境初始化，与发布新政策页面保持一致
+        const app = cloud.init({ env: 'myweb-9g0e5koaf2b403dd' })
+
+        // 监听发布按钮点击事件
+        document.getElementById('submitLogBtn').addEventListener('click', async () => {
+            // 获取表单输入值
+            const title = document.getElementById('logTitle').value
+            const date = document.getElementById('logDate').value
+            const person = document.getElementById('logPerson').value
+            const status = document.getElementById('logStatus').value
+            const content = document.getElementById('logContent').value
+            const publisher = document.getElementById('logPublisher').value
+
+            // 非空校验，必填项校验
+            if (!title || !date || !person || !status || !content) {
+                alert('请填写标题、记录日期、走访人、处理状态和日志内容！')
+                return
+            }
+
+            // 调用云函数提交数据
+            try {
+                const res = await app.callFunction({
+                    name: 'publishPeopleLog', // 对应民情日志发布云函数
+                    data: { title, date, person, status, content, publisher } // 传递日志相关参数
+                })
+                // 发布成功/失败提示
+                if (res.result.code === 0) {
+                    alert('发布成功！')
+                    window.location.href = 'logs.html' // 跳转到民情日志列表页，可根据实际页面名修改
+                } else {
+                    alert('发布失败：' + res.result.msg)
+                }
+            } catch (err) {
+                // 网络或其他异常提示
+                console.error('发布请求异常：', err)
+                alert('网络错误，请稍后重试')
+            }
+        })
+    </script>
+</body>
+</html>
