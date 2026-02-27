@@ -2,349 +2,724 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社区民情服务平台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>四仙便民通</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h1, h2 { color: #333; text-align: center; }
-        .status-bar { text-align: center; padding: 10px; margin-bottom: 20px; border-radius: 4px; font-weight: bold; }
-        .card { border: 1px solid #eee; padding: 15px; margin-bottom: 15px; border-radius: 6px; background: #fafafa; }
-        .card h3 { margin-top: 0; color: #1976d2; }
-        .card .meta { font-size: 0.85em; color: #666; margin-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        .nav { display: flex; justify-content: center; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-        .nav-link { padding: 10px 20px; cursor: pointer; color: #666; text-decoration: none; }
-        .nav-link.active { color: #1976d2; border-bottom: 2px solid #1976d2; margin-bottom: -2px; }
-        .section { display: none; }
-        .section.active { display: block; }
-        .empty-tip { text-align: center; color: #999; padding: 20px; }
+        :root {
+            --primary-red: #A62626;
+            --bg-color: #F9F7F5;
+            --text-dark: #333333;
+            --text-gray: #888888;
+            --border-color: #E0E0E0;
+            --font-main: "Songti SC", "SimSun", "STSong", serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+
+        .header-section {
+            background-color: var(--primary-red);
+            color: #fff;
+            padding-top: 20px;
+            padding-bottom: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(166, 38, 38, 0.3);
+        }
+
+        .logo-box {
+            border: 2px solid #fff;
+            display: inline-block;
+            padding: 8px 30px;
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 16px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background-color: #fff;
+        }
+
+        .content-area {
+            padding: 20px 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            color: var(--primary-red);
+            font-size: 28px;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-red);
+            margin: 10px auto 0;
+        }
+
+        .form-card {
+            background: #fff;
+            padding: 25px 20px;
+            border-left: 5px solid var(--primary-red);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 18px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: block;
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 16px;
+            font-family: var(--font-main);
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .form-input[readonly] {
+            background-color: #f5f5f5;
+            color: var(--text-gray);
+            border-color: #eee;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 16px;
+            font-family: var(--font-main);
+            border: 1px solid #ddd;
+            background-color: #fff;
+            color: var(--text-dark);
+            outline: none;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-red);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            font-family: var(--font-main);
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            letter-spacing: 2px;
+        }
+
+        .btn-submit:hover {
+            background-color: #8B1F1F;
+        }
+
+        .list-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-red);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .list-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .list-meta {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .list-summary {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .btn-view {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--primary-red);
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid var(--primary-red);
+            padding: 4px 12px;
+            border-radius: 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            border-top: 5px solid var(--primary-red);
+            padding: 25px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .modal-date {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        .admin-notice {
+            background-color: #FFF3F3;
+            border: 1px solid var(--primary-red);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--primary-red);
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+            .nav-menu {
+                gap: 15px;
+                font-size: 14px;
+            }
+            .logo-box {
+                font-size: 22px;
+                padding: 6px 20px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>社区民情服务平台</h1>
-    
-    <!-- 状态显示 -->
-    <div id="init-status" class="status-bar">正在初始化...</div>
-
-    <!-- 导航 -->
-    <div class="nav">
-        <div class="nav-link active" onclick="switchTab('home')">首页概况</div>
-        <div class="nav-link" onclick="switchTab('report')">民情上报</div>
-        <div class="nav-link" onclick="switchTab('logs')">民情日志</div>
-        <div class="nav-link" onclick="switchTab('policies')">政策公告</div>
-    </div>
-
-    <!-- 首页 -->
-    <div id="section-home" class="section active">
-        <div class="card">
-            <h3>欢迎使用</h3>
-            <p>本平台基于腾讯云 CloudBase 构建，提供民情上报、日志查询及政策公告功能。</p>
-            <p id="connection-status">正在连接云服务...</p>
+    <div class="header-section">
+        <div class="logo-box">四仙便民通</div>
+        <div class="nav-menu">
+            <div class="nav-item active" data-target="report">一键上报</div>
+            <div class="nav-item" data-target="logs">民情日志</div>
+            <div class="nav-item" data-target="policies">政策速递</div>
+            <div class="nav-item" data-target="publish">发布新政策</div>
         </div>
     </div>
 
-    <!-- 上报表单 -->
-    <div id="section-report" class="section">
-        <div class="card">
-            <h3>提交民情上报</h3>
-            <div class="form-group">
-                <label>类别</label>
-                <select id="reportCategory">
-                    <option value="environment">环境卫生</option>
-                    <option value="security">治安安全</option>
-                    <option value="facility">公共设施</option>
-                    <option value="other">其他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>地点</label>
-                <input type="text" id="reportLocation" placeholder="请输入具体地点">
-            </div>
-            <div class="form-group">
-                <label>描述</label>
-                <textarea id="reportDesc" rows="4" placeholder="请详细描述问题"></textarea>
-            </div>
-            <button id="submitBtn" onclick="submitReport()">提交上报</button>
-        </div>
-    </div>
-
-    <!-- 日志列表 -->
-    <div id="section-logs" class="section">
-        <h2>民情日志</h2>
-        <div id="log-list-container"></div>
-    </div>
-
-    <!-- 政策列表 -->
-    <div id="section-policies" class="section">
-        <h2>政策公告</h2>
-        <div id="policy-list-container"></div>
-    </div>
-</div>
-
-<script>
-    // 全局变量
-    let app = null;
-    let db = null;
-    let isInitCompleted = false;
-    
-    // 本地 fallback 数据
-    const logsData = [];
-    const policiesData = [];
-
-    // 1. 定义备选 CDN 列表
-    const cdnList = [
-        'https://imgcache.qq.com/qcloud/tcb/1.8.0/tcb-web-sdk.js',
-        'https://web.sdk.qcloud.com/tcb/1.8.0/tcb-web-sdk.js'
-    ];
-
-    // 2. 加载 SDK 函数
-    function loadSDK(urls, index = 0) {
-        return new Promise((resolve, reject) => {
-            if (index >= urls.length) {
-                reject(new Error('所有 SDK CDN 均加载失败'));
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = urls[index];
-            script.onload = () => {
-                console.log(`SDK 加载成功：${urls[index]}`);
-                resolve();
-            };
-            script.onerror = () => {
-                console.warn(`SDK 加载失败：${urls[index]}, 尝试下一个...`);
-                loadSDK(urls, index + 1).then(resolve).catch(reject);
-            };
-            document.head.appendChild(script);
-        });
-    }
-
-    // 3. 初始化云环境
-    async function initCloud() {
-        const statusDiv = document.getElementById('init-status');
-        const submitBtn = document.getElementById('submitBtn');
-        const connStatus = document.getElementById('connection-status');
-
-        if (statusDiv) statusDiv.innerText = '正在连接云服务...';
-        if (statusDiv) statusDiv.style.color = '#666';
-        if (submitBtn) submitBtn.disabled = true;
-
-        try {
-            // 确保 SDK 已加载
-            await loadSDK(cdnList);
-            
-            // 初始化 TCB (请确认你的环境 ID 是否正确，去掉空格)
-            // 注意：这里使用的是你提供的 ID，请确保在腾讯云控制台核对无误
-            const envId = 'myweb-9g0e5koaf2b403dd'; 
-            app = tcb.init({ env: envId });
-            
-            const auth = app.auth();
-            await auth.anonymousAuthProvider().signIn();
-            
-            db = app.database();
-            isInitCompleted = true;
-
-            console.log('云环境初始化成功');
-            if (statusDiv) {
-                statusDiv.innerText = '✓ 云服务连接成功';
-                statusDiv.style.color = '#388e3c';
-                if(connStatus) connStatus.innerText = '已连接至云端数据库';
-                setTimeout(() => { if(statusDiv) statusDiv.innerText = ''; }, 3000);
-            }
-        } catch (err) {
-            console.error('云环境初始化失败：', err);
-            app = null;
-            db = null;
-            isInitCompleted = false;
-            
-            let errorMsg = '✗ 云服务初始化失败，使用本地数据模式。';
-            if (err.message && err.message.includes('所有 SDK CDN 均加载失败')) {
-                errorMsg = '✗ 无法加载腾讯云 SDK，请检查网络或防火墙设置。';
-            }
-            if (statusDiv) {
-                statusDiv.innerText = errorMsg;
-                statusDiv.style.color = '#f57c00';
-            }
-            if(connStatus) connStatus.innerText = errorMsg;
-        } finally {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = 1;
-            }
-        }
-    }
-
-    // 4. 从云数据库拉取民情日志
-    async function getLogsFromCloud() {
-        if (!db || !isInitCompleted) return logsData;
-        try {
-            const res = await db.collection('peopleLogs').orderBy('publishTime', 'desc').get();
-            if (res.data && res.data.length > 0) {
-                return res.data.map(item => ({
-                    title: item.title || '无标题',
-                    date: item.date || '未知日期',
-                    summary: item.content ? (item.content.substring(0, 100) + '...') : '',
-                    publisher: item.publisher || '村民'
-                }));
-            } else {
-                return logsData;
-            }
-        } catch (err) {
-            console.error('拉取日志失败：', err);
-            return logsData;
-        }
-    }
-
-    // 5. 从云数据库拉取政策
-    async function getPoliciesFromCloud() {
-        if (!db || !isInitCompleted) return policiesData;
-        try {
-            const res = await db.collection('policies').orderBy('publishTime', 'desc').get();
-            if (res.data && res.data.length > 0) {
-                return res.data.map(item => ({
-                    title: item.title || '无标题',
-                    date: item.date || '未知日期',
-                    summary: item.content ? (item.content.substring(0, 100) + '...') : '',
-                    publisher: item.publisher || '村委会'
-                }));
-            } else {
-                return policiesData;
-            }
-        } catch (err) {
-            console.error('拉取政策失败：', err);
-            return policiesData;
-        }
-    }
-
-    // 6. 渲染民情日志列表
-    function renderLogs(logs) {
-        const container = document.getElementById('log-list-container');
-        if (!container) return;
-        container.innerHTML = '';
-        if (!logs || logs.length === 0) {
-            container.innerHTML = '<div class="empty-tip">暂无日志数据</div>';
-            return;
-        }
-        logs.forEach(log => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <h3>${log.title}</h3>
-                <div class="meta">发布：${log.publisher} | 时间：${log.date}</div>
-                <div>${log.summary}</div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    // 7. 渲染政策列表
-    function renderPolicies(policies) {
-        const container = document.getElementById('policy-list-container');
-        if (!container) return;
-        container.innerHTML = '';
-        if (!policies || policies.length === 0) {
-            container.innerHTML = '<div class="empty-tip">暂无政策公告</div>';
-            return;
-        }
-        policies.forEach(policy => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <h3>${policy.title}</h3>
-                <div class="meta">发布：${policy.publisher} | 时间：${policy.date}</div>
-                <div>${policy.summary}</div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    // 8. 提交上报函数
-    async function submitReport() {
-        if (!isInitCompleted) {
-            alert('云服务未就绪，当前使用本地数据模式，上报功能不可用。请刷新页面重试或检查网络。');
-            return;
-        }
-        if (!app) {
-            alert('云服务未初始化，请刷新页面重试');
-            return;
-        }
-
-        const category = document.getElementById('reportCategory').value;
-        const description = document.getElementById('reportDesc').value;
-        const location = document.getElementById('reportLocation').value;
-        const submitBtn = document.getElementById('submitBtn');
-
-        if (!category || !description || !location) {
-            alert('请填写完整的上报信息！');
-            return;
-        }
-
-        const time = new Date().toLocaleString();
+    <div class="content-area">
         
-        try {
-            submitBtn.disabled = true;
-            submitBtn.innerText = '提交中...';
-            
-            // 调用云函数 submitReport
-            const res = await app.callFunction({
-                name: 'submitReport',
-                data: {
-                    category: category,
-                    content: description,
-                    location: location,
-                    publishTime: new Date().getTime(),
-                    date: time
+        <!-- 模块一：一键上报 -->
+        <div id="report" class="module-section">
+            <h2 class="section-title">网格问题上报</h2>
+            <div class="form-card">
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label class="form-label">上报时间</label>
+                        <input type="text" class="form-input" id="reportDate" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">地理位置</label>
+                        <input type="text" class="form-input" id="reportLocation" value="四仙村·党群服务中心" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">问题类别</label>
+                        <select class="form-input form-select" id="reportCategory">
+                            <option value="environment">环境卫生</option>
+                            <option value="facility">公共设施</option>
+                            <option value="security">治安安全</option>
+                            <option value="other">其他事项</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">问题描述</label>
+                        <textarea class="form-textarea" id="reportDesc" rows="4" placeholder="请详细描述您遇到的问题..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">现场照片</label>
+                        <input type="file" class="form-input" id="reportPhoto" accept="image/*" style="padding: 10px; background: #f9f9f9;">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <img src="https://cos.xxxxxx.com/xxx/PlaceHolder.png" style="width: 60px; height: 60px; object-fit: cover; border: 1px solid #eee;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit">提交上报</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 模块二：民情日志 -->
+        <div id="logs" class="module-section hidden">
+            <h2 class="section-title">民情日志档案</h2>
+            <div id="logsContainer"></div>
+        </div>
+
+        <!-- 模块三：政策速递 -->
+        <div id="policies" class="module-section hidden">
+            <h2 class="section-title">惠民政策速递</h2>
+            <div id="policiesContainer"></div>
+        </div>
+
+        <!-- 模块四：发布新政策 -->
+        <div id="publish" class="module-section hidden">
+            <h2 class="section-title">发布新政策</h2>
+            <div class="admin-notice">
+                ⚠️ 仅限村委会管理员使用，发布后将在"政策速递"中显示
+            </div>
+            <div class="form-card">
+                <form id="publishForm">
+                    <div class="form-group">
+                        <label class="form-label">发布日期</label>
+                        <input type="text" class="form-input" id="publishDate" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">政策标题</label>
+                        <input type="text" class="form-input" id="policyTitle" placeholder="请输入政策标题">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">政策摘要</label>
+                        <textarea class="form-textarea" id="policySummary" rows="3" placeholder="请输入政策摘要（100 字以内）"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">政策内容</label>
+                        <textarea class="form-textarea" id="policyContent" rows="8" placeholder="请输入政策详细内容..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">发布人</label>
+                        <input type="text" class="form-input" id="publisher" value="四仙村村民委员会" readonly>
+                    </div>
+
+                    <button type="submit" class="btn-submit">发布政策</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>© 2026 四仙村村民委员会</p>
+        <p>探索"互联网 + 乡村治理"微创新模式</p>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close">&times;</span>
+            <h3 class="modal-title" id="modal-title">标题</h3>
+            <div class="modal-date" id="modal-date">日期</div>
+            <div class="modal-body" id="modal-body">内容</div>
+        </div>
+    </div>
+
+    <!-- 网页端腾讯云开发SDK及初始化 -->
+    <script src="https://res.wx.qq.com/open/js/cloudbase/1.1.0/cloudbase.full.min.js"></script>
+    <script>
+        // 初始化云开发环境（使用你的环境ID）
+        const app = cloudbase.init({
+            env: "myweb-9g0e5koaf2b403dd"
+        });
+        // 获取云函数调用实例
+        const cloudFunc = app.callFunction;
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 数据准备
+            let logsData = [
+                {
+                    id: 1,
+                    title: '关于村西头路灯维修的走访记录',
+                    date: '2026-01-28',
+                    visitor: '网格员李建国',
+                    villager: '村民王大爷',
+                    content: '今日走访王大爷家，反映村西头主干道第 3 号路灯损坏，夜间出行不便。已现场拍照记录，并联系电力维修部门，预计明日修复。村民对响应速度表示满意。',
+                    status: '已解决'
+                },
+                {
+                    id: 2,
+                    title: '春节前夕困难家庭慰问记录',
+                    date: '2026-01-20',
+                    visitor: '村支书张爱民',
+                    villager: '低保户刘某某',
+                    content: '携米面油慰问品走访刘某某家，询问冬季取暖情况及身体状况。协助检查了家中电路安全，叮嘱注意用火用电。记录其希望申请临时救助的诉求，已带回村委会研究。',
+                    status: '跟进中'
+                },
+                {
+                    id: 3,
+                    title: '村民土地流转意愿调查',
+                    date: '2025-12-15',
+                    visitor: '网格员赵敏',
+                    villager: '村民小组第三组',
+                    content: '针对 upcoming 的农业合作社项目，走访第三组村民，收集土地流转意愿。大部分村民支持统一规划，少数村民对补偿标准有疑虑，已记录并在后续会议中讨论。',
+                    status: '已归档'
                 }
-            });
+            ];
+
+            let policiesData = [
+                {
+                    id: 1,
+                    title: '2026 年四仙村农业种植补贴实施方案',
+                    date: '2026-01-10',
+                    summary: '本年度水稻、小麦种植补贴标准及申报流程详解，请广大农户注意申报时间。',
+                    content: '<p>各位村民：</p><p>为贯彻落实国家惠农政策，结合我村实际情况，现将 2026 年农业种植补贴实施方案公布如下：</p><p><strong>一、补贴对象</strong><br>拥有土地承包经营权并实际种植粮食作物的农户。</p><p><strong>二、补贴标准</strong><br>1. 水稻：每亩 120 元<br>2. 小麦：每亩 100 元<br>3. 玉米：每亩 90 元</p><p><strong>三、申报时间</strong><br>2026 年 1 月 15 日至 2026 年 2 月 28 日。</p><p>请广大村民相互转告，按时申报。</p><p style="text-align:right; margin-top:20px;">四仙村村民委员会<br>2026 年 1 月 10 日</p>'
+                },
+                {
+                    id: 2,
+                    title: '关于做好 2026 年春节期间安全生产工作的通知',
+                    date: '2026-01-05',
+                    summary: '春节期间用火用电安全提示及烟花爆竹燃放规定，确保全村人民度过一个祥和春节。',
+                    content: '<p>各位村民：</p><p>2026 年春节将至，为确保大家度过一个祥和、安全的节日，现将有关事项通知如下：</p><p><strong>一、用火用电安全</strong><br>冬季气候干燥，请注意取暖设备安全，严禁私拉乱接电线。</p><p><strong>二、烟花爆竹燃放</strong><br>请在指定区域燃放，严禁在草堆、树林附近燃放。</p><p><strong>三、值班安排</strong><br>村委会春节期间设有值班室，遇紧急情况请拨打值班电话。</p><p style="text-align:right; margin-top:20px;">四仙村村民委员会<br>2026 年 1 月 5 日</p>'
+                }
+            ];
+
+            let policyIdCounter = 3;
+
+            // 初始化时间
+            const dateInput = document.getElementById('reportDate');
+            const publishDateInput = document.getElementById('publishDate');
             
-            console.log('云函数调用结果：', res);
-            alert('上报成功！');
-            // 清空表单
-            document.getElementById('reportDesc').value = '';
-            document.getElementById('reportLocation').value = '';
-        } catch (err) {
-            console.error('提交失败：', err);
-            alert('提交失败，请稍后重试。');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = '提交上报';
-        }
-    }
+            if (dateInput) {
+                dateInput.value = '2026 年 1 月 25 日 10:30';
+            }
+            if (publishDateInput) {
+                publishDateInput.value = '2026 年 1 月 25 日';
+            }
 
-    // 9. 页面 Tab 切换
-    function switchTab(tabName) {
-        // 隐藏所有 section
-        document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-        // 显示目标 section
-        const target = document.getElementById('section-' + tabName);
-        if (target) target.classList.add('active');
+            // 导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.module-section');
 
-        // 更新导航状态
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        // 简单处理：根据点击事件触发，这里为了简化逻辑，实际项目中建议绑定 event
-        event.target.classList.add('active');
-    }
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    navItems.forEach(function(nav) {
+                        nav.classList.remove('active');
+                    });
+                    sections.forEach(function(sec) {
+                        sec.classList.add('hidden');
+                    });
+                    
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
 
-    // 10. 页面初始化入口
-    async function initPage() {
-        await initCloud();
-        // 并行加载数据
-        const [logs, policies] = await Promise.all([
-            getLogsFromCloud(),
-            getPoliciesFromCloud()
-        ]);
-        renderLogs(logs);
-        renderPolicies(policies);
-    }
+            // 渲染日志
+            function renderLogs() {
+                const container = document.getElementById('logsContainer');
+                if (!container) return;
+                
+                let html = '';
+                logsData.forEach(function(log) {
+                    html += `
+                        <div class="list-card">
+                            <div class="list-title">${log.title}</div>
+                            <div class="list-meta">
+                                <span>${log.date}</span>
+                                <span>走访人：${log.visitor}</span>
+                            </div>
+                            <div class="list-summary">${log.content}</div>
+                            <div class="btn-view" data-type="log" data-id="${log.id}">查看详情</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                bindModalEvents();
+            }
 
-    // 监听 DOM 加载完成
-    document.addEventListener('DOMContentLoaded', initPage);
-</script>
+            // 渲染政策
+            function renderPolicies() {
+                const container = document.getElementById('policiesContainer');
+                if (!container) return;
+
+                let html = '';
+                policiesData.forEach(function(policy) {
+                    html += `
+                        <div class="list-card">
+                            <div class="list-title">${policy.title}</div>
+                            <div class="list-meta">
+                                <span>${policy.date}</span>
+                                <span>政策发布</span>
+                            </div>
+                            <div class="list-summary">${policy.summary}</div>
+                            <div class="btn-view" data-type="policy" data-id="${policy.id}">阅读全文</div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                bindModalEvents();
+            }
+
+            // 绑定模态框事件
+            function bindModalEvents() {
+                const btns = document.querySelectorAll('.btn-view');
+                btns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const type = this.getAttribute('data-type');
+                        const id = parseInt(this.getAttribute('data-id'));
+                        openModal(type, id);
+                    });
+                });
+            }
+
+            // 打开模态框
+            const modal = document.getElementById('detail-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDate = document.getElementById('modal-date');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+
+            function openModal(type, id) {
+                let data = null;
+                if (type === 'log') {
+                    data = logsData.find(function(item) {
+                        return item.id === id;
+                    });
+                    if (data) {
+                        modalTitle.textContent = data.title;
+                        modalDate.textContent = '日期：' + data.date + ' | 走访人：' + data.visitor + ' | 状态：' + data.status;
+                        modalBody.innerHTML = '<p><strong>走访对象：</strong>' + data.villager + '</p><br>' + data.content.replace(/\n/g, '<br>');
+                    }
+                } else if (type === 'policy') {
+                    data = policiesData.find(function(item) {
+                        return item.id === id;
+                    });
+                    if (data) {
+                        modalTitle.textContent = data.title;
+                        modalDate.textContent = '发布日期：' + data.date;
+                        modalBody.innerHTML = data.content;
+                    }
+                }
+                if (data) {
+                    modal.classList.add('active');
+                }
+            }
+
+            // 关闭模态框
+            if (modalClose) {
+                modalClose.addEventListener('click', function() {
+                    modal.classList.remove('active');
+                });
+            }
+
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+
+            // 上报表单提交（适配云函数）
+            const reportForm = document.getElementById('reportForm');
+            if (reportForm) {
+                reportForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    // 1. 获取前端表单数据，做参数映射
+                    const category = document.getElementById('reportCategory').value;
+                    const description = document.getElementById('reportDesc').value; // 匹配云函数的description
+                    const location = document.getElementById('reportLocation').value;
+                    const time = document.getElementById('reportDate').value;
+                    // 2. 非空校验
+                    if (!description) {
+                        alert('请填写问题描述！');
+                        return;
+                    }
+                    // 3. 调用云函数
+                    try {
+                        const res = await cloudFunc({
+                            name: 'index', // 云函数名称，与腾讯云后台保持一致
+                            data: { category, description, location, time }
+                        });
+                        // 4. 根据云函数返回结果提示
+                        if (res.result.code === 0) {
+                            alert('上报成功！' + res.result.msg);
+                            this.reset(); // 重置表单
+                            document.getElementById('reportDate').value = '2026 年 1 月 25 日 10:30';
+                        } else {
+                            alert('上报失败：' + res.result.msg);
+                        }
+                    } catch (err) {
+                        alert('调用失败，请检查云函数是否部署成功！' + err.message);
+                    }
+                });
+            }
+
+            // 发布政策表单提交
+            const publishForm = document.getElementById('publishForm');
+            if (publishForm) {
+                publishForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const title = document.getElementById('policyTitle').value;
+                    const summary = document.getElementById('policySummary').value;
+                    const content = document.getElementById('policyContent').value;
+                    const date = document.getElementById('publishDate').value;
+
+                    if (!title || !summary || !content) {
+                        alert('请填写完整信息！');
+                        return;
+                    }
+
+                    // 添加新政策
+                    const newPolicy = {
+                        id: policyIdCounter++,
+                        title: title,
+                        date: date,
+                        summary: summary,
+                        content: '<p>' + content.replace(/\n/g, '</p><p>') + '</p><p style="text-align:right; margin-top:20px;">四仙村村民委员会<br>' + date + '</p>'
+                    };
+
+                    policiesData.unshift(newPolicy);
+                    
+                    alert('政策发布成功！');
+                    
+                    // 重置表单
+                    this.reset();
+                    if (publishDateInput) {
+                        publishDateInput.value = '2026 年 1 月 25 日';
+                    }
+
+                    // 重新渲染政策列表
+                    renderPolicies();
+                });
+            }
+
+            // 初始化
+            renderLogs();
+            renderPolicies();
+        });
+    </script>
 </body>
 </html>
